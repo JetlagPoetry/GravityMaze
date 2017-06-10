@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/activity_main"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="@drawable/main"
+tools:context="fancy.sj0175.s2.studyjams.cn.gravitymaze.MainActivity">
+<FrameLayout
+    android:id="@+id/ball_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <fancy.sj0175.s2.studyjams.cn.gravitymaze.view.BallView
+        android:id="@+id/ball"
+        android:src="@drawable/ball"
+        android:scaleType="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    </fancy.sj0175.s2.studyjams.cn.gravitymaze.view.BallView>
+</FrameLayout>
+</RelativeLayout>

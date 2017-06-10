@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "70869068558",
+    "firebase_url": "https://gravitymaze-63143.firebaseio.com",
+    "project_id": "gravitymaze-63143",
+    "storage_bucket": "gravitymaze-63143.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:70869068558:android:285bc8647ab46b71",
+        "android_client_info": {
+          "package_name": "fancy.sj0175.s2.studyjams.cn.gravitymaze"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "70869068558-n2fcj56q0t6fs51ri01p56jvcb2ksdc1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fancy.sj0175.s2.studyjams.cn.gravitymaze",
+            "certificate_hash": "09361ea2751e46d9d14b2e7382636be4619ee3b5"
+          }
+        },
+        {
+          "client_id": "70869068558-gi77grijj8qbtu2uu0ua171k6aem5hff.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1vNldIlJWavJkyZzjFhYhYiq4kgWMdR0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "70869068558-gi77grijj8qbtu2uu0ua171k6aem5hff.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GravityMaze</string>
+    <string name="gameover">ＧＡＭＥ\n　ＯＶＥＲ</string>
+    <string name="success">ＳＵＣＣＥＳＳ</string>
+    <string name="gameName">ＴＨＥ　Ｍ A ＺＥ</string>
+    <string name="startGame">开始游戏</string>
+    <string name="again">再来一局</string>
+    <string name="regame">重新开始</string>
+</resources>
