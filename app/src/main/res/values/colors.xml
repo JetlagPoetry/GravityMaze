@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="gameover">#000000</color>
-    <color name="success">#FF4081</color>
+    <color name="gameover">#424242</color>
+    <color name="success">#FF6E40</color>
     <color name="colorWelcome">#FFFFFF</color>
 </resources>
