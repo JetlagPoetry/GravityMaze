@@ -2,7 +2,6 @@ package fancy.sj0175.s2.studyjams.cn.gravitymaze.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 public class BallView extends android.support.v7.widget.AppCompatImageView {
 
@@ -18,13 +17,7 @@ public class BallView extends android.support.v7.widget.AppCompatImageView {
 		// TODO Auto-generated constructor stub
 	}
 
-	
-
-
-
 	public void moveTo(int l,int t){
 		super.setFrame(l, t, l+getWidth(), t+getHeight());
 	}
-	
-	
 }

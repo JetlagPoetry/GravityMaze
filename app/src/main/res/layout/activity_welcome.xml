@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="#009688"
     tools:context="fancy.sj0175.s2.studyjams.cn.gravitymaze.WelcomeActivity">
     <LinearLayout
         android:orientation="vertical"
@@ -31,7 +31,7 @@
             android:layout_marginBottom="20dp"
             android:text="@string/startGame"
             android:textSize="20sp"
-            android:textColor="#ff00"/>
+            android:textColor="#3E2723"/>
     </LinearLayout>
 
 </FrameLayout>

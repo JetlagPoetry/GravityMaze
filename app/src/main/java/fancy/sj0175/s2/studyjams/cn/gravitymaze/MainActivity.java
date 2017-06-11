@@ -1,19 +1,29 @@
 package fancy.sj0175.s2.studyjams.cn.gravitymaze;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MotionEvent;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import fancy.sj0175.s2.studyjams.cn.gravitymaze.view.BallView;
 
@@ -27,146 +37,167 @@ public class MainActivity extends AppCompatActivity {
     private int ball_height = 0;
     private BallView ball;
 
-    private float ballX = 100;
-    private float ballY = 100;
+    private float ballX;
+    private float ballY;
 
-    private TextView show = null;
-    private RelativeLayout linearLayout = null;
+    private TextView mTextField;
+
+    private SensorEventListener listener;
+
+    private long exitTime = 0;
+
+    private Bitmap center;
+
+    private List<Point> centerList;
+
+    private ImageView mImageView;
 
     /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+
+        center  = BitmapFactory.decodeResource(getResources(), R.drawable.center);
+
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-//        showAlertDialog(getWindow().findViewById(R.id.activity_main));
-        linearLayout = (RelativeLayout)super.findViewById(R.id.activity_main);
-        linearLayout.setOnTouchListener(new View.OnTouchListener() {
 
+        listener = new SensorEventListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
                 // TODO Auto-generated method stub
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-                        System.out.println("---action down-----");
-                        show.setText("起始位置为："+"("+event.getX()+" , "+event.getY()+")");
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        System.out.println("---action move-----");
-                        show.setText("移动中坐标为："+"("+event.getX()+" , "+event.getY()+")");
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        System.out.println("---action up-----");
-                        show.setText("最后位置为："+"("+event.getX()+" , "+event.getY()+")");
-                }
-                return true;
+
             }
-        });
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if (!init){
+                    moveTo(0, container_height - ball_height);
+                    return;
+                }
+                float x = event.values[SensorManager.DATA_X]*3;
+                float y = event.values[SensorManager.DATA_Y]*3;
+                float z = event.values[SensorManager.DATA_Z];
+                moveTo(-x,y);
+            }
+        };
+
+        mImageView = (ImageView) findViewById(R.id.center);
+        mTextField = (TextView) findViewById(R.id.timer);
+        new CountDownTimer(3750, 750) {
+            int count = 3;
+            public void onTick(long millisUntilFinished) {
+                if (count == 0) {
+                    mTextField.setText("开始!");
+                    return;
+                }
+                mTextField.setText("" + count);
+                count--;
+            }
+
+            public void onFinish() {
+                mTextField.setVisibility(View.INVISIBLE);
+                View container = findViewById(R.id.activity_main);
+                container_width = container.getWidth();
+                container_height = container.getHeight();
+                Log.v("test", "container x=" + container_width + " container y=" + container_height);
+                ball = (BallView) findViewById(R.id.ball);
+                ball_width = ball.getWidth();
+                ball_height = ball.getHeight();
+                Log.v("test", "ball x =" + ball_width + " y=" + ball_height);
+                ballX = 0;
+                ballY = container_height - ball_height;
+                register();
+                init = true;
+            }
+        }.start();
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;
+        int height = displayMetrics.heightPixels;
+        center = getResizedBitmap(center, width, height);
+        centerList = new ArrayList<>();
+        for (int i=0; i < width; i++) {
+            for (int j=0; j < height; j++) {
+                if (center.getPixel(i, j) != Color.TRANSPARENT) {
+                    centerList.add(new Point(i, j));
+                    Log.v("centerList", "i:" + i + " j:" + j);
+                    i+=5;
+                    j+=5;
+                }
+            }
+        }
+//        mImageView.setImageBitmap(center);
+        Log.v("init", "init finished.");
     }
-    // x, y is between [-MAX_ACCELEROMETER, MAX_ACCELEROMETER]
+
+    private Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                bm, 0, 0, width, height, matrix, false);
+        bm.recycle();
+        return resizedBitmap;
+    }
+
     private void moveTo(float x, float y) {
         ballX +=x;
         ballY +=y;
 
-        if (ballX < 0 ){
+        if (ballX < 0 ) {
             ballX = 0;
         }
 
-        if (ballY < 0){
+        if (ballY < 0) {
             ballY = 0;
         }
 
-        if(ballX > container_width - ball_width&&ballY > container_height - ball_height){
+        if(ballX >= container_width - ball_width && ballY <= 0) {
             unregister();
             finish();
             startActivity(new Intent(getApplicationContext(),SuccessActivity.class));
         }
 
-        if (ballX > container_width - ball_width){
+        if (ballX > container_width - ball_width) {
             ballX = container_width - ball_width;
         }
 
-        if (ballY > container_height - ball_height){
+        if (ballY > container_height - ball_height) {
             ballY = container_height - ball_height;
-        }
-
-        if(((ballX-70)*(ballX-70)+(ballY-200)*(ballY-200))<60*60) {
-            unregister();
-            finish();
-            startActivity(new Intent(getApplicationContext(),GameOverActivity.class));
         }
 
         ball.moveTo((int)ballX, (int)ballY);
         Log.v("ball", "ball x="+ballX+" ball y="+ballY);
+
+        for (Point c : centerList) {
+            if(Math.pow((ballX + ball_width/2 - c.x),2) + Math.pow((ballY + ball_height/2 - c.y),2) <= ball_width * ball_height / 2) {
+                unregister();
+                finish();
+                startActivity(new Intent(getApplicationContext(),GameOverActivity.class));
+            }
+        }
+
     }
 
-//    void translate(int pixelX, int pixelY) {
-//        int x = pixelX + container_width / 2 - ball_width / 2;
-//        int y = pixelY + container_height / 2 - ball_height / 2;
-//        ball.moveTo(x, y);
-//    }
-
-    public void register(){
+    private void register() {
         sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
-    public void unregister(){
+    private void unregister() {
         sensorManager.unregisterListener(listener);
     }
-
-    SensorEventListener listener = new SensorEventListener(){
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            if (!init)
-                return;
-            float x = event.values[SensorManager.DATA_X]*3;
-            float y = event.values[SensorManager.DATA_Y]*3;
-            float z = event.values[SensorManager.DATA_Z];
-//			tv.setText("sensor X="+x+" Y="+y+" Z="+z);
-            moveTo(-x,y);
-
-        }
-
-    };
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        // TODO Auto-generated method stub
-        super.onWindowFocusChanged(hasFocus);
-        if(hasFocus && !init){
-            init();
-            init = true;
-        }
-    }
-
-
-
-
-    public void init(){
-        View container = findViewById(R.id.ball_container);
-        container_width = container.getWidth();
-        container_height = container.getHeight();
-        Log.v("test", "conatiner x="+container_width+" container y="+container_height);
-        ball = (BallView) findViewById(R.id.ball);
-        ball_width = ball.getWidth();
-        ball_height = ball.getHeight();
-        //126,141
-//        Toast.makeText(getApplicationContext(),ball_height+"=="+ball_width+"==",Toast.LENGTH_LONG).show();
-        Log.v("test", "ball x ="+ball_width+" y="+ball_height);
-        moveTo(0, 0);
-    }
-
 
     @Override
     protected void onDestroy() {
@@ -175,7 +206,6 @@ public class MainActivity extends AppCompatActivity {
         unregister();
     }
 
-
     @Override
     protected void onPause() {
         // TODO Auto-generated method stub
@@ -183,20 +213,34 @@ public class MainActivity extends AppCompatActivity {
         unregister();
     }
 
-
     @Override
     protected void onRestart() {
         // TODO Auto-generated method stub
         super.onRestart();
-        register();
+        if (init)
+            register();
     }
-
 
     @Override
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
-        register();
+        if (init)
+            register();
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
+            if((System.currentTimeMillis()-exitTime) > 2000){
+                Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }
