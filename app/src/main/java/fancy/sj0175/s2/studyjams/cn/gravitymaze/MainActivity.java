@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView mImageView;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +66,15 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
+        //get the instance of the firebase analytics
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         center  = BitmapFactory.decodeResource(getResources(), R.drawable.center);
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+
 
         listener = new SensorEventListener() {
             @Override
@@ -164,7 +173,13 @@ public class MainActivity extends AppCompatActivity {
             ballY = 0;
         }
 
+        //game success
         if(ballX >= container_width - ball_width && ballY <= 0) {
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "SUCCESS");
+            bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "type code");
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
             unregister();
             finish();
             startActivity(new Intent(getApplicationContext(),SuccessActivity.class));
@@ -181,8 +196,14 @@ public class MainActivity extends AppCompatActivity {
         ball.moveTo((int)ballX, (int)ballY);
         Log.v("ball", "ball x="+ballX+" ball y="+ballY);
 
+        //game over
         for (Point c : centerList) {
             if(Math.pow((ballX + ball_width/2 - c.x),2) + Math.pow((ballY + ball_height/2 - c.y),2) <= ball_width * ball_height / 2) {
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "FAILED");
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "type code");
+                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
                 unregister();
                 finish();
                 startActivity(new Intent(getApplicationContext(),GameOverActivity.class));
